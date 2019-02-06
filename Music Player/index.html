@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Music Player</title>
+		<script
+			  src="https://code.jquery.com/jquery-3.3.1.js"
+			  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+			  crossorigin="anonymous"></script>
+			  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+			  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet"> 
+<style type="text/css">
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+	background:#111;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+.player-container {
+	overflow:auto;
+	width:400px;
+	background:#222;
+	position:absolute;
+	top:50%;
+	right:50%;
+	transform: translate(50%,-50%);
+	box-shadow:0px 0px 25px 8px #111;
+	font-family:'open sans';
+}
+.background-image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  display: block;
+  background: url('album cover/37291e01ab860f66509cc60d0f0c75bf.1000x1000x1.jpg');
+  background-position:center;
+  background-size:cover;
+  width: 100%;
+  height: 100vh;
+  -webkit-filter: blur(10px);
+  -moz-filter: blur(10px);
+  -o-filter: blur(10px);
+  -ms-filter: blur(10px);
+  filter: blur(10px);
+  /*https://stackoverflow.com/questions/12224320/defined-edges-with-css3-filter-blur*/
+  transform: scale(1.03);/*A hack that zooms the blurred image to un see the blur edges*/
+}
+.album-cover {
+	height:400px;
+	width:100%;
+	background-image: url('album cover/');
+	background: url('album cover/37291e01ab860f66509cc60d0f0c75bf.1000x1000x1.jpg');
+  	background-position:center;
+  	background-size:cover;
+	display:block;
+}
+.music-controls {
+	display:block;
+	width:100%;
+	height:82px;
+	background:#222;
+	color:white;
+	margin:auto;
+}
+.buttons-container {
+	display:block;
+	margin:20px auto;
+	width:47%;
+}
+.buttons-container i {
+	cursor:pointer;
+	font-size:26px;
+	margin:0px 10px;
+}
+#progress-bar {
+	display:inline-block;
+	height:6px;
+	width:200px;
+	background-color:white;
+	border:1px solid black;
+	border-radius:50px;
+}
+#progress-fill {
+	height:100%;
+	width:0px;
+	background-color:red;
+	border-radius:50px;
+}
+#current-duration, #end-duration {
+	display:inline-block;
+}
+#pause {display:none;}
+.control-duration {
+	margin:20px auto;
+	width:74%;
+}
+</style>
+</head>
+<body>
+<!-- Use Howler API for audio visuals. Could replace the album cover image or jsut a background visual in body  https://github.com/goldfire/howler.js -->
+<div class="background-image"></div>
+<audio src="audio files/Deja Vu.mp3" controls id="audioplayer"></audio>
+<div class="player-container">
+	<div class="album-cover"></div>
+	<div class="music-controls">
+		<div class="control-duration">
+<!-- 			<div id=""></div> -->
+			<div id="current-duration">00:00</div>
+			<div id="progress-bar">
+				<div id="progress-fill"></div>
+			</div>
+			<div id="end-duration">00:00</div>
+		</div>
+		<div class="buttons-container">
+			<i class="fas fa-step-backward" id="backward"></i>
+			<i class="fas fa-play" id="play"></i>
+			<i class="fas fa-pause" id="pause"></i>
+			<i class="fas fa-step-forward" id="forward"></i>
+			<i class="fas fa-random" id="shuffle"></i>
+		</div> 
+	</div>
+</div>
+<script type="text/javascript">
+	let playlist = ['audio files/Deja Vu.mp3','audio files/Chillin\'.mp3','audio files/Reverie.mp3','audio files/Vox Populi.mp3'];
+	let albumcover = ['album cover/37291e01ab860f66509cc60d0f0c75bf.1000x1000x1.jpg',
+	'album cover/R-75174-1324152598.jpeg',
+	'album cover/b8e654b7154a051c6634343cbfa2c6897b95b52b.jpg',
+	'album cover/e3859cee3fbc9dd15dcae07f5418e7a1.1000x1000x1.jpg'
+	]; 
+	let counter = 0;
+	$('#audioplayer')[0].volume = 0.5;
+	$('#play').on('click', function(){
+		$('#audioplayer')[0].play();
+		$('#play').css('display','none');
+		$('#pause').css('display','inline-block');
+	});
+	$('#pause').on('click', function(){
+		$('#audioplayer')[0].pause();
+		$('#play').css('display','inline-block');
+		$('#pause').css('display','none');
+	});
+	$('#forward').on('click', function(){
+		++counter;
+		if(counter < 0) {
+			let counter = playlist.length;//go to last song on playlist
+			console.log(counter);
+		}
+		else {
+			let progressWidth = $('#progress-fill').width(0);
+			$('#audioplayer')[0].src = playlist[counter];
+			$('#audioplayer')[0].autoplay = true;//automatically play on next song
+			$('#play').css('display','none');
+			$('#pause').css('display','inline-block');
+			$('.background-image')[0].style.background = " url(" + `'${albumcover[counter]}'` + ") center / cover ";
+			$('.album-cover')[0].style.background = " url(" + `'${albumcover[counter]}'` + ") center / cover ";
+		} 
+	});
+	$('#backward').on('click', function(){
+		--counter;
+		if(counter > playlist.length - 1) {
+			let counter = 0;//go to fist song on playlist
+			console.log(counter);
+			$('#audioplayer')[0].autoplay = true;
+			$('#audioplayer')[0].src = playlist[counter];
+		}
+		else {
+			$('#audioplayer')[0].src = playlist[counter];
+			$('#audioplayer')[0].autoplay = true;//automatically play on next song 
+			$('#play').css('display','none');
+			console.log(counter);
+			$('#pause').css('display','inline-block');
+			$('.background-image')[0].style.background = " url(" + `'${albumcover[counter]}'` + ") center / cover ";
+			$('.album-cover')[0].style.background = " url(" + `'${albumcover[counter]}'` + ") center / cover ";
+		}
+	});
+	$('#audioplayer').on('timeupdate', function() {
+		//Credit: https://stackoverflow.com/questions/11743266/html5-audio-progress-bar-length - Helped solve pexPerSec equation
+		let seconds = Math.floor($(this)[0].currentTime);
+		let minute = 0;
+		let hour = 0;//if minute equals 60 than increment hour by one and reset minute
+		let progressWidth = $('#progress-bar').width();//Length   pixels
+		let duration = Math.floor($(this)[0].duration);   //Duration seconds
+		let pxPerSec = (seconds / duration) * progressWidth;//width in px of progress bar divided by duration in seconds ex: 200px/90sec = 2.22px/1sec
+		let currentWidth = $('#progress-fill').width();
+		$('#progress-fill').width(pxPerSec);
+		if(seconds >= 60) {
+			++minute;
+			$('#current-duration').text(`0${minute}:0${seconds % 60}`);
+			if(seconds >= 10) {
+				$('#current-duration').text(`00:${seconds}`);
+			}
+		} else {
+			if(seconds >= 10) {
+				$('#current-duration').text(`00:${seconds}`);
+			} else {
+				$('#current-duration').text(`00:0${seconds}`);
+			}
+		}
+	}); 
+
+</script>
+</body>
+</html>
